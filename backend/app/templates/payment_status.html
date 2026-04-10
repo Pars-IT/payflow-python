@@ -1,0 +1,12 @@
+<p>Hello {{ name }}</p>
+
+<p>
+Your payment of €{{ amount }} was <b>{{ status }}</b>.
+</p>
+
+{% if reason %}
+<p>Reason: {{ reason }}</p>
+{% endif %}
+
+<p>Payment ID: {{ payment_id }}</p>
+<p>Gateway: <b>{{ gateway }}</b></p>
