@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-ansi
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env || true
+          echo "APP_URL=http://localhost" >> .env
+          echo "DB_HOST=localhost" >> .env
+          echo "DB_DATABASE=test" >> .env
+          echo "DB_USERNAME=root" >> .env
+          echo "DB_PASSWORD=root" >> .env
+          echo "MOLLIE_API_KEY=test" >> .env
+          echo "MOLLIE_WEBHOOK_SECRET=test" >> .env
+          echo "CELERY_BROKER_URL=redis://localhost:6379/0" >> .env
+          echo "MAIL_HOST=localhost" >> .env
+          echo "MAIL_USERNAME=test" >> .env
+          echo "MAIL_PASSWORD=test" >> .env
+          echo "MAIL_FROM_ADDRESS=test@test.com" >> .env
+          echo "MAIL_FROM_NAME=test" >> .env
+
+      - name: Run Ruff (code style check)
+        run: poetry run ruff check .
+
+      - name: Run Tests
+        run: poetry run pytest -v

@@ -24,7 +24,7 @@ class MollieGateway(PaymentGatewayInterface):
                     "value": f"{payment.amount / 100:.2f}",
                 },
                 "description": f"Payment #{payment.id}",
-                "redirectUrl": f"{settings.APP_URL}/api/payments/{payment.id}",
+                "redirectUrl": f"{settings.APP_URL}/payments/{payment.id}",
                 "webhookUrl": f"{settings.APP_URL}/api/webhooks/mollie",
                 "method": "ideal",
                 "metadata": {"payment_id": payment.id},

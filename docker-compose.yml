@@ -1,0 +1,46 @@
+services:
+  mysql:
+    image: mariadb:11.4
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - "6379:6379"
+
+  backend:
+    build: ./backend
+    depends_on:
+      - mysql
+      - redis
+    restart: always
+
+  worker:
+    build: ./backend
+    command: poetry run celery -A app.jobs.payment_job worker --loglevel=info
+    depends_on:
+      - backend
+      - redis
+    restart: always
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always
+
+volumes:
+  mysql_data:
+    name: mysql_data

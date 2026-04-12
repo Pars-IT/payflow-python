@@ -1,6 +1,7 @@
 # app/models/base.py
 from sqlalchemy import Column, DateTime
-from sqlalchemy.ext.declarative import declared_attr, declarative_base
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.sql import func
 from datetime import datetime, timezone
 

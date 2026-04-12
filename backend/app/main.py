@@ -28,6 +28,9 @@ Payment management system with multiple PSPs.
 - ABN AMRO
 """,
     version="1.0.0",
+    docs_url="/api/docs",
+    redoc_url="/api/redoc",
+    openapi_url="/api/openapi.json",
 )
 
 app.add_middleware(
