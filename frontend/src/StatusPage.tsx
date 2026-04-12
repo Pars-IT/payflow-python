@@ -6,6 +6,7 @@ function StatusPage() {
     const { id } = useParams();
     const [status, setStatus] = useState("Loading...");
     const [type, setType] = useState<"pending" | "success" | "failed">("pending");
+    const [failureReason, setFailureReason] = useState("");
 
     useEffect(() => {
         if (!id) return;
@@ -35,6 +36,9 @@ function StatusPage() {
             } else {
                 setStatus("Payment failed");
                 setType("failed");
+                if (payment.failure_reason) {
+                    setFailureReason(payment.failure_reason);
+                }
             }
         }, 1500);
 
@@ -70,6 +74,12 @@ function StatusPage() {
                         {status}
                     </p>
                 </div>
+
+                {type === "failed" && failureReason && (
+                    <p className="text-sm text-red-400 mt-2">
+                        Reason: {failureReason}
+                    </p>
+                )}
 
                 {/* Spinner */}
                 {type === "pending" && (
