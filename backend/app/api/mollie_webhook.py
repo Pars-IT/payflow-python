@@ -47,7 +47,7 @@ async def mollie_webhook(request: Request, db: Session = Depends(get_db)):
     form = await request.form()
     mollie_id = form.get("id")
 
-    logger.info("Mollie webhook called", {"id": mollie_id})
+    logger.info("Mollie webhook called", extra={"mollie_id": mollie_id})
 
     if not mollie_id:
         return {"error": "invalid_webhook"}
@@ -62,7 +62,7 @@ async def mollie_webhook(request: Request, db: Session = Depends(get_db)):
         res.raise_for_status()
         mollie_payment = res.json()
     except Exception as e:
-        logger.error("Mollie API error", {"error": str(e)})
+        logger.error("Mollie API error: %s", e)
         return {"ok": True}
 
     repo = PaymentRepository(db)
@@ -73,7 +73,7 @@ async def mollie_webhook(request: Request, db: Session = Depends(get_db)):
     try:
         payment = repo.find_by_provider_payment_id("mollie", mollie_id)
     except Exception:
-        logger.warning("Payment not found", {"provider_id": mollie_id})
+        logger.warning("Payment not found for Mollie provider ID %s", mollie_id)
         return {"ok": True}
 
     def logic():
@@ -82,7 +82,7 @@ async def mollie_webhook(request: Request, db: Session = Depends(get_db)):
 
         mollie_amount = int(float(mollie_payment["amount"]["value"]) * 100)
         if mollie_amount != payment.amount:
-            logger.error("Amount mismatch", {"payment_id": payment.id})
+            logger.error("Amount mismatch for payment %s", payment.id)
             return
 
         status = mollie_payment.get("status", "").lower()
@@ -102,5 +102,5 @@ async def mollie_webhook(request: Request, db: Session = Depends(get_db)):
             finalizer.fail(payment, reason)
 
     redis_service.with_lock(payment.id, logic)
-    logger.info("Webhook processed successfully", {"payment_id": payment.id})
+    logger.info("Webhook processed successfully for payment %s", payment.id)
     return {"ok": True}
