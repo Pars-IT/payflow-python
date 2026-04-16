@@ -63,7 +63,7 @@ function App() {
 
         {/* Title */}
         <h2 className="text-xl font-semibold text-center text-blue-600">
-          Payment
+          Python Payflow v1.0
         </h2>
 
         {/* Credit */}
